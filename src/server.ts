@@ -5,7 +5,10 @@ import express, { Request, Response, NextFunction } from "express";
 import studentRoutes from "./routes/studentRoutes.js";
 
 const app = express();
-const PORT = 4000;
+const port = Number(process.env.PORT ?? 4000);
+if (!Number.isInteger(port) || port < 1 || port > 65535) {
+  throw new Error('PORT must be an integer between 1 and 65535');
+}
 
 // Shared logging middleware
 app.use((req: Request, res: Response, next: NextFunction) => {
@@ -26,7 +29,7 @@ app.use((req: Request, res: Response) => {
 });
 
 // Start server
-app.listen(PORT, () => {
+app.listen(port, '0.0.0.0', () => {
   pool.query('SELECT NOW()')
   .then(() => console.log('Database connected successfully'))
   .catch((error: unknown) => {
@@ -36,5 +39,5 @@ app.listen(PORT, () => {
       code: databaseError.code,
     });
   });
-  console.log(`Server is running at http://localhost:${PORT}`);
+  console.log(`Server is listening on port ${port}`);
 });
